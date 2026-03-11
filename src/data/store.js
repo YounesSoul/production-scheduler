@@ -649,21 +649,30 @@ const store = {
     const uid = await getCurrentUserId();
     if (!uid) throw new Error('No user');
 
-    // 1. Insert new project
+    // 1. Insert new project WITH owner_id (required by RLS policy)
     const { data: proj, error: projErr } = await supabase
       .from('projects')
-      .insert({ name })
+      .insert({ name, owner_id: uid })
       .select()
       .single();
 
     if (projErr) throw projErr;
 
     // 2. Add current user as admin collaborator
-    const { error: collabErr } = await supabase
-      .from('collaborators')
-      .insert({ project_id: proj.id, user_id: uid, role: 'admin' });
-
-    if (collabErr) throw collabErr;
+    //    Try RPC first (SECURITY DEFINER bypasses RLS), fallback to direct insert
+    try {
+      const { error: rpcErr } = await supabase.rpc('add_owner_collaborator', {
+        p_project_id: proj.id,
+        p_user_id: uid
+      });
+      if (rpcErr) throw rpcErr;
+    } catch {
+      // Fallback: direct insert (works if RLS policy allows it)
+      const { error: collabErr } = await supabase
+        .from('collaborators')
+        .insert({ project_id: proj.id, user_id: uid, role: 'admin' });
+      if (collabErr) throw collabErr;
+    }
 
     // 3. Update local state and switch to new project
     this.projects.unshift(proj);
