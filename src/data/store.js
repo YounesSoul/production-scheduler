@@ -643,6 +643,44 @@ const store = {
     this.notify();
   },
 
+  async createProject(name) {
+    if (!this._supabaseAvailable) throw new Error('Supabase not available');
+
+    const uid = await getCurrentUserId();
+    if (!uid) throw new Error('No user');
+
+    // 1. Insert new project
+    const { data: proj, error: projErr } = await supabase
+      .from('projects')
+      .insert({ name })
+      .select()
+      .single();
+
+    if (projErr) throw projErr;
+
+    // 2. Add current user as admin collaborator
+    const { error: collabErr } = await supabase
+      .from('collaborators')
+      .insert({ project_id: proj.id, user_id: uid, role: 'admin' });
+
+    if (collabErr) throw collabErr;
+
+    // 3. Update local state and switch to new project
+    this.projects.unshift(proj);
+    this.currentProjectId = proj.id;
+    this.currentRole = 'admin';
+    localStorage.setItem('current_project_id', proj.id);
+
+    // Reset orders/schedule for new project
+    this.orders = [];
+    this.schedule = [];
+
+    this.setupRealtime();
+    this.notify();
+
+    return proj;
+  },
+
   clearAll() {
     if (!this.currentProjectId) return;
 

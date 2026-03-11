@@ -152,7 +152,7 @@ async function startApp() {
 
     // Remove loading state
     document.body.classList.remove('loading');
-    console.log('✅ App initialized');
+    console.log('App initialized');
 }
 
 // ── Render all views
@@ -306,9 +306,9 @@ document.getElementById('btn-reschedule').addEventListener('click', () => {
     store.setSchedule(result.schedule);
 
     if (result.unscheduled.length > 0) {
-        showToast(`⚠ ${result.unscheduled.length} order(s) could not be scheduled`);
+        showToast(`${result.unscheduled.length} order(s) could not be scheduled`);
     } else {
-        showToast(`✅ ${result.schedule.length} orders scheduled successfully`);
+        showToast(`${result.schedule.length} orders scheduled successfully`);
     }
 
     // Switch to schedule tab
@@ -318,13 +318,14 @@ document.getElementById('btn-reschedule').addEventListener('click', () => {
     document.getElementById('tab-schedule').classList.add('active');
 });
 
-// ── Import Excel
+// ── Import Excel (with project creation step)
 const fileInput = document.getElementById('file-input');
+let _pendingImportOrders = null;
+let _pendingImportFileName = '';
 
 document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
 
-fileInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
+async function handleImportFile(file) {
     if (!file) return;
     try {
         const buffer = await file.arrayBuffer();
@@ -333,13 +334,82 @@ fileInput.addEventListener('change', async (e) => {
             showToast('No orders found in the file');
             return;
         }
-        store.setOrders([...store.orders, ...orders]);
-        showToast(`✅ Imported ${orders.length} orders from Excel`);
+        // Store parsed orders and show project-name modal
+        _pendingImportOrders = orders;
+        _pendingImportFileName = file.name;
+
+        const modal = document.getElementById('import-project-modal');
+        const nameInput = document.getElementById('import-project-name');
+        const fileInfo = document.getElementById('import-file-info');
+
+        // Pre-fill with a sensible default based on filename
+        const baseName = file.name.replace(/\.(xlsx|xls|csv)$/i, '').replace(/[_-]/g, ' ');
+        nameInput.value = baseName;
+        fileInfo.textContent = `File: ${file.name} · ${orders.length} order(s) found`;
+
+        modal.classList.remove('hidden');
+        nameInput.focus();
+        nameInput.select();
     } catch (err) {
-        showToast('❌ Failed to import file: ' + err.message);
+        showToast('Failed to import file: ' + err.message);
         console.error(err);
     }
     fileInput.value = '';
+}
+
+fileInput.addEventListener('change', (e) => handleImportFile(e.target.files[0]));
+
+// ── Import Project Modal handlers
+const importProjectModal = document.getElementById('import-project-modal');
+const importProjectConfirm = document.getElementById('import-project-confirm');
+const importProjectCancel = document.getElementById('import-project-cancel');
+const importProjectClose = document.getElementById('import-project-close');
+
+function closeImportModal() {
+    importProjectModal.classList.add('hidden');
+    _pendingImportOrders = null;
+    _pendingImportFileName = '';
+}
+
+importProjectCancel.addEventListener('click', closeImportModal);
+importProjectClose.addEventListener('click', closeImportModal);
+importProjectModal.addEventListener('click', (e) => { if (e.target === importProjectModal) closeImportModal(); });
+
+importProjectConfirm.addEventListener('click', async () => {
+    const nameInput = document.getElementById('import-project-name');
+    const projectName = nameInput.value.trim();
+    if (!projectName) {
+        nameInput.style.borderColor = 'var(--danger)';
+        nameInput.focus();
+        return;
+    }
+
+    if (!_pendingImportOrders || _pendingImportOrders.length === 0) {
+        closeImportModal();
+        return;
+    }
+
+    // Disable button while working
+    const oldText = importProjectConfirm.textContent;
+    importProjectConfirm.textContent = 'Creating...';
+    importProjectConfirm.disabled = true;
+
+    try {
+        // 1. Create new project
+        await store.createProject(projectName);
+
+        // 2. Load orders into the new project
+        store.setOrders(_pendingImportOrders);
+
+        showToast(`Imported ${_pendingImportOrders.length} orders into "${projectName}"`);
+        closeImportModal();
+    } catch (err) {
+        showToast('Failed to create project: ' + err.message);
+        console.error(err);
+    } finally {
+        importProjectConfirm.textContent = oldText;
+        importProjectConfirm.disabled = false;
+    }
 });
 
 // ── Drop zone
@@ -354,19 +424,7 @@ dropZone.addEventListener('drop', async (e) => {
     e.preventDefault();
     dropZone.classList.remove('dragover');
     const file = e.dataTransfer.files[0];
-    if (!file) return;
-    try {
-        const buffer = await file.arrayBuffer();
-        const orders = importOrdersFromExcel(buffer);
-        if (orders.length === 0) {
-            showToast('No orders found in the file');
-            return;
-        }
-        store.setOrders([...store.orders, ...orders]);
-        showToast(`✅ Imported ${orders.length} orders from Excel`);
-    } catch (err) {
-        showToast('❌ Failed to import: ' + err.message);
-    }
+    handleImportFile(file);
 });
 dropZone.addEventListener('click', () => fileInput.click());
 
@@ -390,7 +448,7 @@ document.getElementById('gantt-zoom-out').addEventListener('click', ganttZoomOut
 // ── Download Gantt Table button
 document.getElementById('btn-download-gantt-table').addEventListener('click', () => {
     if (store.schedule.length === 0) {
-        showToast('⚠ ' + store.t('noSchedule'));
+        showToast(store.t('noSchedule'));
         return;
     }
     exportGanttTable(store.orders, store.schedule);

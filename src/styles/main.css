@@ -1751,43 +1751,69 @@ body::before {
 /* ── Action buttons in table ───────────────────────── */
 .action-btns {
   display: flex;
-  gap: 6px;
+  gap: 4px;
+  align-items: center;
 }
 
 .action-btns button {
-  padding: 5px 12px;
-  font-size: 0.7rem;
-  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 0;
+  border-radius: 8px;
   border: 1px solid transparent;
   cursor: pointer;
-  font-family: var(--font);
-  font-weight: 600;
-  transition: all 0.2s ease;
-  letter-spacing: 0.02em;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.action-btns button svg {
+  flex-shrink: 0;
 }
 
 .action-btns .btn-edit {
-  background: var(--info-bg);
+  background: rgba(56, 189, 248, 0.06);
   color: var(--info);
   border-color: rgba(56, 189, 248, 0.1);
 }
 
 .action-btns .btn-edit:hover {
-  background: rgba(56, 189, 248, 0.2);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
-  transform: translateY(-1px);
+  background: rgba(56, 189, 248, 0.18);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.action-btns .btn-notes {
+  position: relative;
+  background: rgba(139, 92, 246, 0.06);
+  color: var(--text-secondary);
+  border-color: rgba(139, 92, 246, 0.1);
+  font-size: 0;
+}
+
+.action-btns .btn-notes:hover {
+  background: rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.3);
+  color: var(--accent);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.2);
+  transform: translateY(-2px);
 }
 
 .action-btns .btn-del {
-  background: var(--danger-bg);
+  background: rgba(248, 113, 113, 0.06);
   color: var(--danger);
   border-color: rgba(248, 113, 113, 0.1);
 }
 
 .action-btns .btn-del:hover {
-  background: rgba(248, 113, 113, 0.2);
-  box-shadow: 0 0 12px rgba(248, 113, 113, 0.15);
-  transform: translateY(-1px);
+  background: rgba(248, 113, 113, 0.18);
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.2);
+  transform: translateY(-2px);
+  border-color: rgba(248, 113, 113, 0.3);
 }
 
 /* ── RESPONSIVE ────────────────────────────────────── */

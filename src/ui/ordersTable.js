@@ -41,11 +41,15 @@ export function renderOrdersTable() {
       <td>${o.lockedChain ? `<span class="badge badge-info">${o.lockedChain}</span>` : '—'}</td>
       <td>
         <div class="action-btns">
-          <button class="btn-edit" data-idx="${i}">${store.t('edit')}</button>
-          <button class="btn-notes" data-idx="${i}" title="Notes &amp; Attachments">
-            📝${_hasNotes(o.id) ? '<span class="notes-indicator"></span>' : ''}
+          <button class="btn-edit" data-idx="${i}" title="${store.t('edit')}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
           </button>
-          <button class="btn-del" data-idx="${i}">${store.t('delete')}</button>
+          <button class="btn-notes" data-idx="${i}" title="Notes & Attachments">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>${_hasNotes(o.id) ? '<span class="notes-indicator"></span>' : ''}
+          </button>
+          <button class="btn-del" data-idx="${i}" title="${store.t('delete')}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          </button>
         </div>
       </td>
     </tr>
