@@ -1,0 +1,23 @@
+{
+  "name": "mgt-system-saiss",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
+    "apexcharts": "^5.10.1",
+    "dotenv": "^17.3.1",
+    "html2canvas": "^1.4.1",
+    "node-localstorage": "^3.0.5",
+    "xlsx": "^0.18.5"
+  }
+}

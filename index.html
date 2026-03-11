@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Automated production scheduling system for textile manufacturing - 9 production chains" />
+  <title>Production Scheduler — Textile Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
+</head>
+
+<body>
+  <div id="app-root" class="accent-line"></div>
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-lockup">
+          <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          <div class="header-titles">
+            <h1 data-i18n="appTitle">Production Scheduler</h1>
+            <span class="header-separator">/</span>
+            <span class="subtitle">Textile Manufacturing</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Workspace controls -->
+        <div class="header-workspace">
+          <select id="lang-toggle" class="header-select">
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+          </select>
+          <select id="project-select" class="header-select"
+            style="max-width: 140px; text-overflow: ellipsis; display: none;">
+          </select>
+          <button id="btn-edit-project" class="header-icon-btn" title="Rename Project" style="display:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button id="btn-manage-members" class="header-icon-btn" title="Manage Members" style="display:none;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Action icons -->
+        <div class="header-actions">
+          <div class="notification-container">
+            <button id="btn-notifications" class="header-icon-btn" title="Notifications">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span id="notif-badge" class="notif-badge hidden">0</span>
+            </button>
+            <div id="notif-dropdown" class="notif-dropdown hidden">
+              <div class="notif-dropdown-title">Notifications</div>
+              <div id="notif-list" class="notif-dropdown-list">No new notifications</div>
+            </div>
+          </div>
+          <button id="btn-import" class="header-icon-btn" title="Import Excel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </button>
+          <button id="btn-export" class="header-icon-btn" title="Export Excel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Primary action + avatar -->
+        <button id="btn-reschedule" class="btn btn-primary btn-reschedule" title="Run Scheduler"
+          data-i18n-title="schedule">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span data-i18n="schedule">Schedule</span>
+        </button>
+        <div id="header-avatar" class="header-avatar" title="Profile">?</div>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="orders">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" />
+        </svg>
+        <span data-i18n="orders">Orders</span>
+      </button>
+      <button class="tab-btn" data-tab="schedule">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span data-i18n="schedule">Schedule</span>
+      </button>
+      <button class="tab-btn" data-tab="gantt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="17" y1="10" x2="3" y2="10" />
+          <line x1="21" y1="6" x2="3" y2="6" />
+          <line x1="21" y1="14" x2="3" y2="14" />
+          <line x1="17" y1="18" x2="3" y2="18" />
+        </svg>
+        <span data-i18n="gantt">Gantt Chart</span>
+      </button>
+      <button class="tab-btn" data-tab="dashboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.21 15.89A10 10 0 118 2.83" />
+          <path d="M22 12A10 10 0 0012 2v10z" />
+        </svg>
+        <span data-i18n="dashboard">Dashboard</span>
+      </button>
+      <button class="tab-btn" data-tab="notes">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+        <span>Notes</span>
+      </button>
+    </nav>
+
+    <!-- Tab Content -->
+    <main class="tab-content">
+      <section id="tab-orders" class="tab-panel active">
+        <div class="panel-header">
+          <h2 data-i18n="orders">Production Orders</h2>
+          <div class="panel-actions">
+            <div class="rate-control">
+              <label for="rate-input">⚡ pcs/day</label>
+              <input type="number" id="rate-input" min="50" max="2000" step="10" value="630" class="rate-input">
+            </div>
+            <button id="btn-add-order" class="btn btn-accent">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span data-i18n="addOrder">Add Order</span>
+            </button>
+            <button id="btn-clear-orders" class="btn btn-secondary"
+              style="color: var(--danger); border-color: var(--danger-bg); background: var(--danger-bg); transition: all 0.2s;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              <span data-i18n="clearAll">Clear All</span>
+            </button>
+
+          </div>
+        </div>
+        <div id="drop-zone" class="drop-zone">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <p data-i18n="importExcel">Drop an Excel file here to import orders</p>
+        </div>
+        <div class="table-container">
+          <table id="orders-table" class="data-table">
+            <thead>
+              <tr>
+                <th data-i18n="orderId">Order ID</th>
+                <th data-i18n="client">Client</th>
+                <th data-i18n="model">Model</th>
+                <th data-i18n="type">Type</th>
+                <th data-i18n="quantity">Quantity</th>
+                <th data-i18n="arrivalDate">Arrival Date</th>
+                <th data-i18n="deliveryDate">Delivery Date</th>
+                <th data-i18n="duration">Duration (days)</th>
+                <th data-i18n="priority">Priority</th>
+                <th data-i18n="lockChain">Lock Chain</th>
+                <th data-i18n="actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody"></tbody>
+          </table>
+          <div id="orders-empty" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <p>No orders yet. Add an order or import from Excel.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-schedule" class="tab-panel">
+        <div class="panel-header">
+          <h2 data-i18n="schedule">Production Schedule</h2>
+          <p class="panel-subtitle" id="schedule-info"></p>
+        </div>
+        <div class="table-container">
+          <table id="schedule-table" class="data-table">
+            <thead>
+              <tr>
+                <th>Chain</th>
+                <th data-i18n="orderId">Order ID</th>
+                <th data-i18n="client">Client</th>
+                <th data-i18n="model">Model</th>
+                <th data-i18n="type">Type</th>
+                <th data-i18n="quantity">Quantity</th>
+                <th data-i18n="plannedStart">Start Date</th>
+                <th data-i18n="plannedEnd">End Date</th>
+                <th data-i18n="durationDays">Duration</th>
+                <th data-i18n="status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-tbody"></tbody>
+          </table>
+          <div id="schedule-empty" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <p>No schedule generated yet. Add orders and click "Schedule".</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-gantt" class="tab-panel">
+        <div class="panel-header">
+          <h2>Gantt Chart</h2>
+          <div class="gantt-controls">
+            <button id="btn-download-gantt-table" class="btn btn-sm btn-accent" title="Download chain table as Excel">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download Table
+            </button>
+            <button id="btn-download-chart" class="btn btn-sm btn-download-chart" title="Download Gantt chart as PNG"
+              data-i18n-title="downloadChart">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+              </svg>
+              <span data-i18n="downloadChart">Download Chart</span>
+            </button>
+            <button id="gantt-zoom-in" class="btn btn-sm btn-ghost">Zoom In</button>
+            <button id="gantt-zoom-out" class="btn btn-sm btn-ghost">Zoom Out</button>
+            <button id="gantt-today" class="btn btn-sm btn-ghost">Today</button>
+          </div>
+        </div>
+        <div id="gantt-container" class="gantt-container">
+          <div id="gantt-empty" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <line x1="17" y1="10" x2="3" y2="10" />
+              <line x1="21" y1="6" x2="3" y2="6" />
+              <line x1="21" y1="14" x2="3" y2="14" />
+              <line x1="17" y1="18" x2="3" y2="18" />
+            </svg>
+            <p>No schedule to display. Generate a schedule first.</p>
+          </div>
+        </div>
+        <div id="gantt-legend" class="gantt-legend"></div>
+      </section>
+
+      <!-- ── Notes Tab ── -->
+      <section id="tab-notes" class="tab-panel">
+        <!-- Rendered dynamically by postitBoard.js -->
+      </section>
+
+      <section id="tab-dashboard" class="tab-panel">
+        <div class="dash-header">
+          <div class="dash-header-left">
+            <div class="dash-header-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.21 15.89A10 10 0 118 2.83" />
+                <path d="M22 12A10 10 0 0012 2v10z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="dash-title" data-i18n="dashboardTitle">Analytics Dashboard</h2>
+              <span class="dash-subtitle" data-i18n="dashboardSubtitle">Production performance overview</span>
+            </div>
+          </div>
+          <div class="dash-header-controls">
+            <select id="dashboard-month" class="header-select dash-month-select">
+              <option value="">All Months</option>
+            </select>
+          </div>
+        </div>
+        <div id="dashboard-content">
+          <!-- KPI Hero Cards -->
+          <div class="kpi-cards" id="kpi-cards"></div>
+
+          <!-- Row 1: Utilization Bar + OTD Donut -->
+          <div class="dash-charts-row dash-charts-row--2col">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>Chain Utilization</h3>
+                <span class="chart-badge chart-badge--blue">Bar Chart</span>
+              </div>
+              <div id="chart-util"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>On-Time Delivery Rate</h3>
+                <span class="chart-badge chart-badge--green">Donut</span>
+              </div>
+              <div id="chart-otd"></div>
+            </div>
+          </div>
+
+          <!-- Row 2: Heatmap full-width -->
+          <div class="chart-card dash-chart-full">
+            <div class="chart-card-header">
+              <h3>Weekly Factory Load</h3>
+              <span class="chart-badge chart-badge--purple">Heat Map</span>
+            </div>
+            <div id="chart-heatmap"></div>
+          </div>
+
+          <!-- Row 3: Risk Orders + Overtime Suggestions -->
+          <div class="dash-charts-row dash-charts-row--2col">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>Risk &amp; Late Orders</h3>
+                <span class="chart-badge chart-badge--red">Alerts</span>
+              </div>
+              <div id="risk-cards-container" class="risk-cards-grid"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>Overtime Suggestions</h3>
+                <span class="chart-badge chart-badge--amber">Actions</span>
+              </div>
+              <div id="overtime-cards-container" class="risk-cards-grid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dashboard-empty" class="dash-empty-state">
+          <div class="dash-empty-card">
+            <div class="dash-empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.21 15.89A10 10 0 118 2.83" />
+                <path d="M22 12A10 10 0 0012 2v10z" />
+              </svg>
+            </div>
+            <h3 data-i18n="noDataTitle">No analytics data yet</h3>
+            <p data-i18n="noDataDesc">Import orders and generate a schedule to see your production KPIs and charts.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Order Edit Modal -->
+    <div id="order-modal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modal-title">Add Order</h3>
+          <button id="modal-close" class="btn-icon">&times;</button>
+        </div>
+        <form id="order-form" class="modal-form">
+          <input type="hidden" id="form-edit-index" value="-1">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-id">Order ID</label>
+              <input type="text" id="form-id" required placeholder="e.g. ORD-001">
+            </div>
+            <div class="form-group">
+              <label for="form-client">Client</label>
+              <input type="text" id="form-client" required placeholder="e.g. Zara">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-model">Model</label>
+              <input type="text" id="form-model" required placeholder="e.g. T-Shirt Classic">
+            </div>
+            <div class="form-group">
+              <label for="form-quantity">Quantity</label>
+              <input type="number" id="form-quantity" required min="1" placeholder="e.g. 500">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-arrival">Arrival Date</label>
+              <input type="date" id="form-arrival" required>
+            </div>
+            <div class="form-group">
+              <label for="form-delivery">Delivery Date</label>
+              <input type="date" id="form-delivery" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-duration">Production Duration (days)</label>
+              <input type="number" id="form-duration" required min="1" placeholder="e.g. 5">
+            </div>
+            <div class="form-group">
+              <label for="form-priority">Priority</label>
+              <select id="form-priority">
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-lock">Lock to Chain (optional)</label>
+              <select id="form-lock">
+                <option value="">Auto-assign</option>
+                <option value="CH1">CH1</option>
+                <option value="CH2">CH2</option>
+                <option value="CH3">CH3</option>
+                <option value="CH4">CH4</option>
+                <option value="CH5">CH5</option>
+                <option value="CH6">CH6</option>
+                <option value="CH7">CH7</option>
+                <option value="CH8">CH8</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" id="form-cancel" class="btn btn-ghost">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Order</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="delete-modal" class="modal-overlay hidden">
+      <div class="modal" style="max-width:400px">
+        <div class="modal-header">
+          <h3>⚠️ Confirm Delete</h3>
+          <button id="delete-modal-close" class="btn-icon">&times;</button>
+        </div>
+        <p id="delete-modal-msg" style="padding:1rem 1.5rem;color:var(--text-secondary);margin:0">Are you sure you want
+          to delete this order?</p>
+        <div class="form-actions" style="padding:0 1.5rem 1.5rem">
+          <button type="button" id="delete-cancel" class="btn btn-ghost">Cancel</button>
+          <button type="button" id="delete-confirm" class="btn"
+            style="background:var(--danger);color:#fff">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Members Modal -->
+    <div id="members-modal" class="modal-overlay hidden">
+      <div class="modal" style="max-width: 500px;">
+        <div class="modal-header">
+          <h3>Project Members</h3>
+          <button id="members-close" class="btn-icon">&times;</button>
+        </div>
+        <div style="padding: 1.5rem">
+          <ul id="members-list"
+            style="list-style: none; padding: 0; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          </ul>
+          <hr style="border:0; border-top:1px solid var(--border-color); margin: 1rem 0;">
+          <h4>Invite Collaborator</h4>
+          <form id="invite-form" style="display:flex; gap: 0.5rem; margin-top: 0.5rem; align-items: stretch;">
+            <input type="email" id="invite-email" placeholder="Email address" required class="rate-input"
+              style="flex:1; margin:0">
+            <select id="invite-role" class="rate-input" style="margin:0">
+              <option value="viewer">Viewer</option>
+              <option value="planner">Planner</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+            </select>
+            <button type="submit" id="btn-send-invite" class="btn btn-primary" style="margin:0">Invite</button>
+          </form>
+          <p id="invite-status" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);"></p>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none">
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
