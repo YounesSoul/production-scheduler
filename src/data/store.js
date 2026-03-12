@@ -250,6 +250,12 @@ const store = {
       this._realtimeSubscription = null;
     }
 
+    // Clear any pending reloads from the previous project
+    if (this._reloadTimer) {
+      clearTimeout(this._reloadTimer);
+      this._reloadTimer = null;
+    }
+
     // Subscribe to changes on orders and schedules for the active project
     this._realtimeSubscription = supabase.channel(`project-${this.currentProjectId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: `project_id=eq.${this.currentProjectId}` }, () => {

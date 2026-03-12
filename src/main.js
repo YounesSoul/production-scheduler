@@ -160,7 +160,6 @@ function renderAll() {
     renderOrdersTable();
     renderScheduleTable();
     renderGanttChart();
-    renderKpiDashboard();
     renderDashboard();
     renderPostitBoard();
 
