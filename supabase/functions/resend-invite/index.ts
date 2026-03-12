@@ -26,7 +26,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "PlannerApp <onboarding@resend.dev>", // Required for free tier testing
+        from: "Saiss Management <noreply@saissmgt.com>", // Required for free tier testing
         to: email,
         subject: `You've been invited to collaborate on ${projectName}`,
         html: `

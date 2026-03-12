@@ -181,6 +181,9 @@ export function initWorkspaceUI() {
                 const inviteLink = `${window.location.origin}/#invite=${invData.id}`;
 
                 const { data: fnData, error: fnErr } = await supabase.functions.invoke('resend-invite', {
+                    headers: {
+                        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                    },
                     body: {
                         email,
                         role,
