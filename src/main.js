@@ -160,8 +160,16 @@ function renderAll() {
     renderOrdersTable();
     renderScheduleTable();
     renderGanttChart();
+    renderKpiDashboard();
     renderDashboard();
     renderPostitBoard();
+
+    // Show visibility manager only for admins/planners/managers
+    const visBtn = document.getElementById('btn-visibility-manager');
+    if (visBtn) {
+        if (store.currentRole !== 'viewer') visBtn.classList.remove('hidden');
+        else visBtn.classList.add('hidden');
+    }
 }
 
 // ── Auth state listener
@@ -427,6 +435,58 @@ dropZone.addEventListener('drop', async (e) => {
     handleImportFile(file);
 });
 dropZone.addEventListener('click', () => fileInput.click());
+
+// ── Visibility Manager Modal
+const visModal = document.getElementById('visibility-modal');
+if (visModal) {
+    document.getElementById('btn-visibility-manager').addEventListener('click', () => {
+        visModal.classList.remove('hidden');
+    });
+
+    const closeVis = () => {
+        visModal.classList.add('hidden');
+        document.getElementById('visibility-client-input').value = '';
+        document.getElementById('visibility-month-input').value = '';
+    };
+
+    document.getElementById('visibility-modal-close').addEventListener('click', closeVis);
+    document.getElementById('visibility-modal-done').addEventListener('click', closeVis);
+    visModal.addEventListener('click', (e) => { if (e.target === visModal) closeVis(); });
+
+    // Client hide/show
+    document.getElementById('btn-hide-client').addEventListener('click', () => {
+        const client = document.getElementById('visibility-client-input').value;
+        if (client) {
+            store.setClientHidden(client, true);
+            showToast(`Hidden orders for client: ${client}`);
+        }
+    });
+
+    document.getElementById('btn-show-client').addEventListener('click', () => {
+        const client = document.getElementById('visibility-client-input').value;
+        if (client) {
+            store.setClientHidden(client, false);
+            showToast(`Showing orders for client: ${client}`);
+        }
+    });
+
+    // Month hide/show
+    document.getElementById('btn-hide-month').addEventListener('click', () => {
+        const month = document.getElementById('visibility-month-input').value;
+        if (month) {
+            store.setMonthHidden(month, true);
+            showToast(`Hidden orders for month: ${month}`);
+        }
+    });
+
+    document.getElementById('btn-show-month').addEventListener('click', () => {
+        const month = document.getElementById('visibility-month-input').value;
+        if (month) {
+            store.setMonthHidden(month, false);
+            showToast(`Showing orders for month: ${month}`);
+        }
+    });
+}
 
 // ── Export Excel
 document.getElementById('btn-export').addEventListener('click', () => {

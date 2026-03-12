@@ -119,6 +119,7 @@ const store = {
       duration: o.duration || 1,
       priority: o.priority || 'normal',
       locked_chain: o.lockedChain || '',
+      is_hidden: o.isHidden || false,
     };
   },
 
@@ -137,6 +138,7 @@ const store = {
       duration: row.duration || 1,
       priority: row.priority || 'normal',
       lockedChain: row.locked_chain || '',
+      isHidden: row.is_hidden || false,
     };
   },
 
@@ -152,6 +154,7 @@ const store = {
       status: s.status || 'On Time',
       split_group: s.splitGroup || null,
       split_position: s.splitPosition || null,
+      is_hidden: s.isHidden || false,
     };
   },
 
@@ -166,6 +169,7 @@ const store = {
       status: row.status || 'On Time',
       splitGroup: row.split_group || undefined,
       splitPosition: row.split_position || undefined,
+      isHidden: row.is_hidden || false,
     };
   },
 
@@ -409,6 +413,51 @@ const store = {
     this.schedule = schedule;
     this.save();
     this.notify();
+  },
+
+  // ── Visibility Toggles (Admins/Planners/Managers only)
+  setOrderHidden(orderId, isHidden) {
+    if (this.currentRole === 'viewer') return;
+    const order = this.orders.find(o => o.id === orderId);
+    if (order) {
+      order.isHidden = isHidden;
+      this.save();
+      this.notify();
+    }
+  },
+
+  setClientHidden(clientName, isHidden) {
+    if (this.currentRole === 'viewer') return;
+    let changed = false;
+    const lowerName = clientName.toLowerCase().trim();
+    this.orders.forEach(o => {
+      if ((o.client || '').toLowerCase().trim() === lowerName) {
+        o.isHidden = isHidden;
+        changed = true;
+      }
+    });
+    if (changed) {
+      this.save();
+      this.notify();
+    }
+  },
+
+  setMonthHidden(yearMonth, isHidden) {
+    if (this.currentRole === 'viewer') return;
+    let changed = false;
+    this.orders.forEach(o => {
+      // Check arrivalDate or deliveryDate against 'YYYY-MM'
+      const arrMatch = o.arrivalDate && o.arrivalDate.startsWith(yearMonth);
+      const delMatch = o.deliveryDate && o.deliveryDate.startsWith(yearMonth);
+      if (arrMatch || delMatch) {
+        o.isHidden = isHidden;
+        changed = true;
+      }
+    });
+    if (changed) {
+      this.save();
+      this.notify();
+    }
   },
 
   // ── Chain splitting: run two orders simultaneously at half capacity

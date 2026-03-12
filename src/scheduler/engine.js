@@ -277,6 +277,7 @@ export function runScheduler(orders) {
             duration,
             status,
             pieceType: order.pieceType,
+            isHidden: order.isHidden || false,
         });
     });
 
@@ -450,7 +451,8 @@ export function runScheduler(orders) {
                     status,
                     pieceType: order.pieceType,
                     splitPart: index + 1,
-                    totalSplits: splits.length
+                    totalSplits: splits.length,
+                    isHidden: order.isHidden || false,
                 });
             });
         } else {
@@ -475,6 +477,7 @@ export function runScheduler(orders) {
                 duration,
                 status,
                 pieceType: order.pieceType,
+                isHidden: order.isHidden || false,
             });
         }
     });

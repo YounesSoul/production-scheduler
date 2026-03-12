@@ -178,6 +178,13 @@
               </svg>
               <span data-i18n="addOrder">Add Order</span>
             </button>
+            <button id="btn-visibility-manager" class="btn btn-secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>Visibility</span>
+            </button>
             <button id="btn-clear-orders" class="btn btn-secondary"
               style="color: var(--danger); border-color: var(--danger-bg); background: var(--danger-bg); transition: all 0.2s;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -556,6 +563,50 @@
     </div>
 
     <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none">
+  </div>
+
+  <!-- Visibility Manager Modal -->
+  <div id="visibility-modal" class="modal-overlay hidden">
+    <div class="modal-content fade-in" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3 id="modal-title-visibility">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          Visibility Manager
+        </h3>
+        <button id="visibility-modal-close" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: -0.5rem; line-height: 1.4;">
+          Hide specific orders from users with the <strong>Viewer</strong> role. Hidden orders will not appear in their
+          tables or Gantt charts.
+        </p>
+
+        <div class="form-group">
+          <label>By Client</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="visibility-client-input" placeholder="e.g. Zara" class="form-control"
+              style="flex: 1;">
+            <button id="btn-hide-client" class="btn btn-secondary" style="white-space: nowrap;">Hide Client</button>
+            <button id="btn-show-client" class="btn btn-secondary" style="white-space: nowrap;">Show Client</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>By Month (Arrival or Delivery)</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="month" id="visibility-month-input" class="form-control" style="flex: 1;">
+            <button id="btn-hide-month" class="btn btn-secondary" style="white-space: nowrap;">Hide Month</button>
+            <button id="btn-show-month" class="btn btn-secondary" style="white-space: nowrap;">Show Month</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button id="visibility-modal-done" class="btn btn-primary">Done</button>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="/src/main.js"></script>

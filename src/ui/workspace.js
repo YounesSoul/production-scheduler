@@ -65,6 +65,7 @@ export function initWorkspaceUI() {
             document.getElementById('btn-clear-orders'),
             document.getElementById('btn-import'),
             document.getElementById('btn-reschedule'),
+            document.getElementById('btn-visibility-manager'),
             document.getElementById('drop-zone')
         ];
 
@@ -334,11 +335,13 @@ async function initNotifications() {
         await fetchNotifs();
 
         // Mark all read
-        btnReadAll.addEventListener('click', async () => {
-            await supabase.from('notifications').update({ is_read: true }).eq('user_id', userId);
-            fetchNotifs();
-            notifDropdown.classList.add('hidden');
-        });
+        if (btnReadAll) {
+            btnReadAll.addEventListener('click', async () => {
+                await supabase.from('notifications').update({ is_read: true }).eq('user_id', userId);
+                fetchNotifs();
+                notifDropdown.classList.add('hidden');
+            });
+        }
 
         // Realtime Subscription
         if (notifChannel) supabase.removeChannel(notifChannel);

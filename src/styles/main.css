@@ -1774,6 +1774,20 @@ body::before {
   flex-shrink: 0;
 }
 
+.action-btns .btn-visibility {
+  background: rgba(16, 185, 129, 0.06);
+  /* Emerald tint */
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.1);
+}
+
+.action-btns .btn-visibility:hover {
+  background: rgba(16, 185, 129, 0.18);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
 .action-btns .btn-edit {
   background: rgba(56, 189, 248, 0.06);
   color: var(--info);
